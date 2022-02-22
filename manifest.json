@@ -1,0 +1,6 @@
+{
+    "name": "Table exporter",
+    "version": "0.0.1",
+    "manifest_version": 2,
+    "description": "Exports a table from the DOM as a CSV file."
+}
