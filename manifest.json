@@ -1,6 +1,29 @@
 {
-    "name": "Table exporter",
+    "name": "Table Exporter",
     "version": "0.0.1",
-    "manifest_version": 2,
-    "description": "Exports a table from the DOM as a CSV file."
+    "manifest_version": 3,
+    "description": "Exports a table from the DOM as a CSV file.",
+    "icons": {
+        "32": "icons/table_black32x32.png",
+        "64": "icons/table_black64x64.png",
+        "128": "icons/table_black128x128.png",
+        "512": "icons/table_black512x512.png"
+    },
+    "permissions": [
+        "downloads",
+        "tabs"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["https://*/*", "file://*/*"],
+            "js": ["tables.js"]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_title": "Export table on this page",
+        "default_popup": "./popup.html"
+    }
 }
