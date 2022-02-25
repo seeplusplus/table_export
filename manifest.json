@@ -4,6 +4,7 @@
     "manifest_version": 3,
     "description": "Exports a table from the DOM as a CSV file.",
     "icons": {
+        "16": "icons/table_black16x16.png",
         "32": "icons/table_black32x32.png",
         "64": "icons/table_black64x64.png",
         "128": "icons/table_black128x128.png",
@@ -11,7 +12,8 @@
     },
     "permissions": [
         "downloads",
-        "tabs"
+        "tabs",
+        "contextMenus"
     ],
     "content_scripts": [
         {
