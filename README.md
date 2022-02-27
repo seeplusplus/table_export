@@ -8,7 +8,9 @@ Notifies you when there's a table on the page. Provides download for tables as a
 | File | Work |
 -------|------
 |tables.js| Content script for detecting tables in page and communicating page info to the service worker.|
-|background.js| Receives messages from content script|
+|background.js| Receives messages from content script.|
+|test/| HTML files with different test cases for this extension.|
+|build.sh| Zips all the important files for publishing to browser store.|
 
 ## TODO
 
