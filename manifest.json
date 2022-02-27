@@ -1,6 +1,6 @@
 {
     "name": "Table Exporter",
-    "version": "0.0.1",
+    "version": "1.0.0-rc.0",
     "manifest_version": 3,
     "description": "Exports a table from the DOM as a CSV file.",
     "icons": {
@@ -23,9 +23,5 @@
     ],
     "background": {
         "service_worker": "background.js"
-    },
-    "action": {
-        "default_title": "Export table on this page",
-        "default_popup": "./popup.html"
     }
 }
