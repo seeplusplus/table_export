@@ -1,16 +1,14 @@
-const downloadTableContextMenuId = '100';
+const downloadTableContextMenuId = 'TABLE_EXPORT_DOWNLOAD_MENU';
 
 var backgroundState = {
-    tableCsv: null,
-    tableUrl: null,
+    last_sender_id: undefined
 };
 
-function enableContextMenu() {
+function updateContextMenu(enabled) {
     chrome.contextMenus.update(
         downloadTableContextMenuId,
         {
-            enabled: true,
-            visible: true
+            enabled: enabled
         }
     );
 }
@@ -21,28 +19,32 @@ function setupContextMenu() {
         contexts: [
             'page',
         ],
-        enabled: false, // TODO: disabled when user doesn't right click on table.
+        enabled: false,
         title: 'Download table as CSV',
-        // visible: false,
     }
     chrome.contextMenus.create(contextMenuProperties);
 }
 
 function setupEventListeners(state) {
-
+    /**
+     * On install
+    */
     chrome.runtime.onInstalled.addListener(setupContextMenu);
 
-    chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-        if (!state.tableCsv) {
-            return;
-        }
-
-        const downloadId = await chrome.downloads.download({
-            url: state.tableUrl,
-           // saveAs: true, // TODO: This never opens nor does it start a download when true.
+    /**
+     * Context Menu
+    */
+    chrome.contextMenus.onClicked.addListener(() => {
+        chrome.tabs.sendMessage(state.last_sender_id, 
+        {
+            type: 'generate_file',
         });
+        updateContextMenu(false);
     });
     
+    /**
+     * Message Passing
+    */
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.type === "table_found") {
             table_count = parseInt(message.payload.tables_count, 10);
@@ -56,9 +58,12 @@ function setupEventListeners(state) {
                 color: '#00FF00'
             });
         } else if (message.type === "table_clicked") {
-            enableContextMenu();
-            state.tableCsv = message.payload.as_csv;
-            state.tableUrl = message.payload.payload_url;
+            updateContextMenu(true);
+            state.last_sender_id = sender.tab.id;
+        } else if (message.type === 'start_download') {
+            chrome.downloads.download({
+                url: message.payload.url
+            })
         }
     });    
 }
@@ -66,6 +71,4 @@ function setupEventListeners(state) {
 /**
  * Event listeners
  */
-
-
 setupEventListeners(backgroundState);

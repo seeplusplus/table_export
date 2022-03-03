@@ -1,8 +1,3 @@
-function getCsvFromTable(tableSelector) {
-	let table = document.querySelector(tableSelector);
-	return getCsvFromTableElement(table);
-}
-
 function getCsvFromTableElement(table) {
 	let rows = [...table.querySelectorAll('tr')]
 
@@ -15,36 +10,45 @@ function getCsvFromTableElement(table) {
 	).join('\n');
 }
 
-function createFileFromString(string_data, name) {
+function createCsvFileFromString(string_data, name) {
 	return new File(string_data.split(), name, { type: 'text/csv' });
 }
 
-function bootstrapTableDetection() {
+function bootstrapTableDetection(state) {
     let tables = document.querySelectorAll('table');
-
-    // message plugin that tables are detected
-    // if (tables.length > 0) {
-    //     chrome.runtime.sendMessage({ 
-    //         type: 'table_found',
-    //         payload: {
-    //             tables_count: tables.length}
-    //     });
-    // }
-
-    // hookup click listener for tables on page
     tables.forEach(t =>
         t.addEventListener('contextmenu', function(event) {
-            const tableCsv = getCsvFromTableElement(event.currentTarget);
+            state.last_table_targeted = event.currentTarget;
             chrome.runtime.sendMessage({
                 type: 'table_clicked',
-                payload: {
-                    as_csv: tableCsv,
-                    payload_url: URL.createObjectURL(createFileFromString(tableCsv))
-                }
             })
         })
     );
 }
 
-bootstrapTableDetection();
+function bootstrapMessageListener(state) {
+    chrome.runtime.onMessage.addListener(
+        function (message) {
+            console.table(message);
+            if (message.type === 'generate_file') {
 
+                const csv = getCsvFromTableElement(state.last_table_targeted);
+                const file = createCsvFileFromString(csv);
+
+                chrome.runtime.sendMessage({
+                    type: 'start_download',
+                    payload: {
+                        url: URL.createObjectURL(file)
+                    }
+                });
+            }
+        }
+    );
+}
+
+let contentState = {
+    last_table_targeted: undefined
+};
+
+bootstrapTableDetection(contentState);
+bootstrapMessageListener(contentState);
