@@ -1,7 +1,7 @@
 {
     "name": "Table Exporter",
     "version": "1.0.0",
-    "version_name": "1.0.0-rc1",
+    "version_name": "1.0.0-rc2",
     "manifest_version": 3,
     "description": "Exports a table from the DOM as a CSV file.",
     "icons": {
