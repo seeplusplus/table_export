@@ -1,13 +1,38 @@
-function getCsvFromTableElement(table) {
-	let rows = [...table.querySelectorAll('tr')]
+function getSeparatorFor(node) {
+    if (node instanceof Text) {
+        return '';
+    }
+    else if (node instanceof HTMLTableCellElement) {
+        return ','
+    }
+    else if (node instanceof HTMLTableRowElement || node instanceof HTMLTableSectionElement) {
+        return '\n'
+    }
+}
 
-	return rows.reduce(
-	    (p, row) => {
-            let cols = [...row.querySelectorAll('td, th')];
-            return [...p, [...cols].reduce((s, col) => [...s, col.textContent], []).join(', ')];
-        },
-	    []
-	).join('\n');
+function convertToText(htmlTableElement) {
+    return [...htmlTableElement.childNodes].reduce(
+        (string, node, index, childNodes) => {
+            let inner = '';
+            let terminator = '';
+            if (node instanceof Text) {
+                inner = node.textContent.trim();
+            } else {
+                inner = convertToText(node);
+            }
+
+            if (childNodes.some((node, node_idx) => node_idx > index && !(node instanceof Text))) {
+                terminator = getSeparatorFor(node);
+            }
+
+            return `${string}${inner}${terminator}`;
+        }, 
+        ''
+    );
+}
+
+function getCsvFromTableElement(table) {
+    return convertToText(table);
 }
 
 function createCsvFileFromString(string_data, name) {
