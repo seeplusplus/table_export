@@ -16,16 +16,19 @@ function convertToText(htmlTableElement) {
             let inner = '';
             let terminator = '';
             if (node instanceof Text) {
-                inner = node.textContent.trim();
+                inner = node.textContent.trim().replaceAll('"', '""');
             } else {
                 inner = convertToText(node);
             }
 
-            if (childNodes.some((node, node_idx) => node_idx > index && !(node instanceof Text))) {
-                terminator = getSeparatorFor(node);
-            }
+            terminator = getSeparatorFor(node) ?? '';
+            let useTerminator = childNodes.some((node, node_idx) => node_idx > index && !(node instanceof Text));
 
-            return `${string}${inner}${terminator}`;
+            if (terminator.includes(',')) {
+                inner = `"${inner}"`;
+            }
+            
+            return `${string}${inner}${useTerminator ? terminator : ''}`;
         }, 
         ''
     );
@@ -54,7 +57,6 @@ function bootstrapTableDetection(state) {
 function bootstrapMessageListener(state) {
     chrome.runtime.onMessage.addListener(
         function (message) {
-            console.table(message);
             if (message.type === 'generate_file') {
 
                 const csv = getCsvFromTableElement(state.last_table_targeted);
